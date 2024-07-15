@@ -40,5 +40,6 @@ class CreateSppCron extends Command
 
       $notification = new NotificationBillCreated;
       $notification->spp();
+
     }
 }

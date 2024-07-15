@@ -22,7 +22,7 @@ class PaketMail extends Mailable
     public $pdf;
     public $pdfReport;
 
-    public function __construct($mailData, $subject, $pdf, $pdfReport=null)
+    public function __construct($mailData, $subject, $pdf, $pdfReport = null)
     {
         $this->mailData = $mailData;
         $this->subject = $subject;
@@ -55,20 +55,37 @@ class PaketMail extends Mailable
      *
      * @return array<int, \Illuminate\Mail\Mailables\Attachment>
      */
-    public function attachments(): array
-    {
-        $file = [
-            Attachment::fromData(fn () => $this->pdf->output(), 'Paket '.date('F Y', strtotime($this->mailData['bill'][0]->created_at)). ' ' . $this->mailData['student']->name)
-            ->withMime('application/pdf'),
-        ];
+    // public function attachments(): array
+    // {
+    //     $file = [
+    //         Attachment::fromData(fn () => $this->pdf->output(), 'Paket '.date('F Y', strtotime($this->mailData['bill'][0]->created_at)). ' ' . $this->mailData['student']->name)
+    //         ->withMime('application/pdf'),
+    //     ];
 
-        if($this->pdfReport)
-        {
-            array_push($file, 
-            Attachment::fromData(fn () => $this->pdfReport->output(), 'Report '. $this->mailData['bill'][0]->type. ' ' .date('F Y'). ' ' . $this->mailData['student']->name)
-            ->withMime('application/pdf'));
+    //     if($this->pdfReport)
+    //     {
+    //         array_push($file, 
+    //         Attachment::fromData(fn () => $this->pdfReport->output(), 'Report '. $this->mailData['bill'][0]->type. ' ' .date('F Y'). ' ' . $this->mailData['student']->name)
+    //         ->withMime('application/pdf'));
+    //     }
+
+    //     return $file;
+    // }
+
+    public function build()
+    {
+        $email = $this->subject($this->subject)
+            ->view('emails.paket-mail')
+            ->attachData($this->pdf->output(), 'Paket ' . date('F Y', strtotime($this->mailData['bill'][0]->created_at)) . ' ' . $this->mailData['student']->name . '.pdf', [
+                'mime' => 'application/pdf',
+            ]);
+
+        if ($this->pdfReport) {
+            $email->attachData($this->pdfReport->output(), 'Report ' . $this->mailData['bill'][0]->type . ' ' . date('F Y') . ' ' . $this->mailData['student']->name . '.pdf', [
+                'mime' => 'application/pdf',
+            ]);
         }
 
-        return $file;
+        return $email;
     }
 }
