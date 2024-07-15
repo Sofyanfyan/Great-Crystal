@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bill;
+use App\Models\InvoiceSupplier;
 use App\Models\Student;
 use App\Models\Teacher;
 use Carbon\Carbon;
@@ -41,6 +42,7 @@ class DashboardController extends Controller
          $teacherData = Teacher::where('is_active', true)->orderBy('id', 'desc')->take(6)->get();
 
          $studentData = Student::where('is_active', true)->orderBy('id', 'desc')->take(6)->get();
+         $invoiceSuppliers = InvoiceSupplier::all();
 
 
          $data = (object)[
@@ -52,6 +54,7 @@ class DashboardController extends Controller
             'dataPastDue' => $pastDueData,
             'dataTeacher' => $teacherData,
             'dataStudent' => $studentData,
+            'invoiceSuppliers' => $invoiceSuppliers,
          ];
 
          return view('components.dashboard')->with('data', $data);
